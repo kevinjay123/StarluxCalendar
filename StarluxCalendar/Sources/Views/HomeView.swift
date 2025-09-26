@@ -10,7 +10,7 @@ import ComposableArchitecture
 import Foundation
 
 struct HomeView: View {
-    var store: StoreOf<HomeFeature>
+    @Bindable var store: StoreOf<HomeFeature>
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
@@ -38,30 +38,29 @@ struct HomeView: View {
                 .navigationTitle("Airports")
                 .background(Color(AppColor.background))
                 .sheet(
-                    isPresented: viewStore.binding(
-                        get: \.isListPresented,
-                        send: .dismissList
+                    item: $store.scope(
+                        state: \.airportList,
+                        action: \.list
                     )
-                ) {
-                    AirportListView(store: store.scope(state: \.list, action: \.list))
-                        .presentationDetents([.medium])
+                ) { store in
+                    AirportListView(store: store)
                 }
                 .sheet(
-                    isPresented: viewStore.binding(
-                        get: \.isShowDatePicker,
-                        send: .dismissDatePicker
+                    item: $store.scope(
+                        state: \.yearMonthPicker,
+                        action: \.yearMonth
                     )
-                ) {
-                    YearMonthPickerView(store: store.scope(state: \.yearMonthList, action: \.yearMonth))
+                ) { store in
+                    YearMonthPickerView(store: store)
                         .presentationDetents([.fraction(0.3)])
                 }
                 .sheet(
-                    isPresented: viewStore.binding(
-                        get: \.isShowCabinType,
-                        send: .dismissCabinType
+                    item: $store.scope(
+                        state: \.cabinList,
+                        action: \.selectedCabin
                     )
-                ) {
-                    CabinView(store: store.scope(state: \.cabinList, action: \.selectedCabin))
+                ) { store in
+                    CabinView(store: store)
                         .presentationDetents([.fraction(0.3)])
                 }
             }

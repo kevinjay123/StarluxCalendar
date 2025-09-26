@@ -13,66 +13,59 @@ struct HomeFeature {
     
     @ObservableState
     struct State: Equatable {
+        @Presents var airportList: AirportListFeature.State?
         var airports: [AirportModel] = []
         var fromCity: AirportModel?
         var toCity: AirportModel?
+        var departureType: DepartureType?
         
-        var isShowDatePicker: Bool = false
+        @Presents var yearMonthPicker: YearMonthPickerFeature.State?
         var selectedYear: Int = 2025
         var selectedMonth: Int = 9
         let years: [Int] = Array(2000...2030)
         let months: [Int] = Array(1...12)
         
-        var departureType: DepartureType?
-        var isListPresented: Bool = false
-        
+        @Presents var cabinList: CabinFeature.State?
         var cabinTypes: [CabinType] = CabinType.allCases
         var selectedCabin: CabinType = .eco
-        var isShowCabinType: Bool = false
     }
     
     enum Action: Equatable {
         case scenePhaseBecomeActive
         case swapAirport
         case airportsResponse(Result<[AirportModel], AirportError>)
-        
+        case list(PresentationAction<AirportListFeature.Action>)
         case showList(DepartureType)
-        case dismissList
-        case list(AirportListFeature.Action)
         
-        case yearMonth(YearMonthPickerFeature.Action)
+        case yearMonth(PresentationAction<YearMonthPickerFeature.Action>)
         case showDatePicker
-        case dismissDatePicker
         
         case showCabinType
-        case dismissCabinType
-        case selectedCabin(CabinFeature.Action)
+        case selectedCabin(PresentationAction<CabinFeature.Action>)
     }
     
     @Dependency(\.airportService) var airportService
     
     var body: some ReducerOf<Self> {
-        Scope(state: \.list, action: \.list) {
-            AirportListFeature()
-        }
-        
-        Scope(state: \.yearMonthList, action: \.yearMonth) {
-            YearMonthPickerFeature()
-        }
-        
         Reduce(core)
+            .ifLet(\.$airportList, action: \.list) {
+                AirportListFeature()
+            }
+            .ifLet(\.$yearMonthPicker, action: \.yearMonth) {
+                YearMonthPickerFeature()
+            }
+            .ifLet(\.$cabinList, action: \.selectedCabin) {
+                CabinFeature()
+            }
     }
 
     func core(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
         case .showList(let type):
             state.departureType = type
-            state.isListPresented = true
+            state.airportList = AirportListFeature.State(items: state.airports)
             return .none
-        case .dismissList:
-            state.isListPresented = false
-            return .none
-        case let .list(.selectItem(item)):
+        case let .list(.presented(.selectItem(item))):
             guard let departureType = state.departureType else {
                 return .none
             }
@@ -84,41 +77,46 @@ struct HomeFeature {
                 state.toCity = item
             }
             
-            state.isListPresented = false
+            state.airportList = nil
             return .none
-        case .list(.cancel):
-            state.isListPresented = false
+        case .list(.presented(.cancel)):
+            state.airportList = nil
+            return .none
+        case .list(.dismiss):
+            state.airportList = nil
             return .none
         case .showDatePicker:
-            state.isShowDatePicker = true
+            state.yearMonthPicker = YearMonthPickerFeature.State(
+                year: state.selectedYear,
+                month: state.selectedMonth,
+                years: state.years,
+                months: state.months
+            )
             return .none
-        case .dismissDatePicker:
-            state.isShowDatePicker = false
+        case .yearMonth(.presented(.selectYear(let year))):
+            state.selectedYear = year
             return .none
-        case .yearMonth(let action):
-            switch action {
-            case .selectYear(let year):
-                state.selectedYear = year
-            case .selectMonth(let month):
-                state.selectedMonth = month
-            case .confirm:
-                state.isShowDatePicker = false
-            }
+        case .yearMonth(.presented(.selectMonth(let month))):
+            state.selectedMonth = month
+            return .none
+        case .yearMonth(.presented(.confirm)):
+            state.yearMonthPicker = nil
+            return .none
+        case .yearMonth(.dismiss):
+            state.yearMonthPicker = nil
             return .none
         case .showCabinType:
-            state.isShowCabinType = true
+            state.cabinList = CabinFeature.State(cabins: state.cabinTypes)
             return .none
-        case .dismissCabinType:
-            state.isShowCabinType = false
+        case let .selectedCabin(.presented(.selectItem(type))):
+            state.selectedCabin = type
+            state.cabinList = nil
             return .none
-        case .selectedCabin(let action):
-            switch action {
-            case .selectItem(let cabinType):
-                state.selectedCabin = cabinType
-            case .cancel:
-                state.isShowCabinType = false
-            }
-            state.isShowCabinType = false
+        case .selectedCabin(.dismiss):
+            state.cabinList = nil
+            return .none
+        case .selectedCabin(.presented(.cancel)):
+            state.cabinList = nil
             return .none
         case .scenePhaseBecomeActive:
             return .run { send in
@@ -141,31 +139,12 @@ struct HomeFeature {
             }
             
             return .none
-
         case .airportsResponse(.failure(.loadingFailed(_))):
             state.airports = []
             return .none
-
         case .swapAirport:
             (state.fromCity, state.toCity) = (state.toCity, state.fromCity)
             return .none
         }
-    }
-}
-
-extension HomeFeature.State {
-    var list: AirportListFeature.State {
-        get { AirportListFeature.State(items: airports, selectedItem: nil) }
-        set {}
-    }
-    
-    var yearMonthList: YearMonthPickerFeature.State {
-        get { YearMonthPickerFeature.State(year: selectedYear, month: selectedMonth, years: years, months: months) }
-        set {}
-    }
-    
-    var cabinList: CabinFeature.State {
-        get { CabinFeature.State(cabins: cabinTypes, selectedCabin: nil) }
-        set {}
     }
 }
