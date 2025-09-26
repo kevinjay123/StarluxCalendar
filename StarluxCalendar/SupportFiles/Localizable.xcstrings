@@ -64,6 +64,9 @@
         }
       }
     },
+    "Calendar" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "zh-Hant" : {
@@ -154,6 +157,9 @@
           }
         }
       }
+    },
+    "Hello" : {
+
     },
     "Month" : {
       "localizations" : {

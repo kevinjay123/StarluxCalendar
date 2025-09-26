@@ -28,6 +28,8 @@ struct HomeFeature {
         @Presents var cabinList: CabinFeature.State?
         var cabinTypes: [CabinType] = CabinType.allCases
         var selectedCabin: CabinType = .eco
+        
+        var path = StackState<Path.State>()
     }
     
     enum Action: Equatable {
@@ -42,6 +44,9 @@ struct HomeFeature {
         
         case showCabinType
         case selectedCabin(PresentationAction<CabinFeature.Action>)
+        
+        case path(StackActionOf<Path>)
+        case toCalendar
     }
     
     @Dependency(\.airportService) var airportService
@@ -57,6 +62,7 @@ struct HomeFeature {
             .ifLet(\.$cabinList, action: \.selectedCabin) {
                 CabinFeature()
             }
+            .forEach(\.path, action: \.path)
     }
 
     func core(into state: inout State, action: Action) -> Effect<Action> {
@@ -144,6 +150,11 @@ struct HomeFeature {
             return .none
         case .swapAirport:
             (state.fromCity, state.toCity) = (state.toCity, state.fromCity)
+            return .none
+        case .path(_):
+            return .none
+        case .toCalendar:
+            state.path.append(.calendar(.init()))
             return .none
         }
     }

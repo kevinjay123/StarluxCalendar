@@ -14,55 +14,60 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            NavigationStack {
-                ScrollView {
-                    VStack {
-                        departureView
-                        Spacer(minLength: 5)
-                        departureDateView
-                        Spacer(minLength: 24)
-                        searchView
+        NavigationStack(
+            path: $store.scope(state: \.path, action: \.path)
+        ) {
+            ScrollView {
+                VStack {
+                    departureView
+                    Spacer(minLength: 5)
+                    departureDateView
+                    Spacer(minLength: 24)
+                    searchView
+                }
+                .padding(.top, 24)
+                .frame(maxWidth: .infinity, alignment: .top)
+                .onChange(of: scenePhase) { _, newValue in
+                    switch newValue {
+                    case .active:
+                        store.send(.scenePhaseBecomeActive)
+                    default:
+                        break
                     }
-                    .padding(.top, 24)
-                    .frame(maxWidth: .infinity, alignment: .top)
-                    .onChange(of: scenePhase) { oldValue, newValue in
-                        switch newValue {
-                        case .active:
-                            viewStore.send(.scenePhaseBecomeActive)
-                        default:
-                            break
-                        }
-                    }
                 }
-                .navigationTitle("Airports")
-                .background(Color(AppColor.background))
-                .sheet(
-                    item: $store.scope(
-                        state: \.airportList,
-                        action: \.list
-                    )
-                ) { store in
-                    AirportListView(store: store)
-                }
-                .sheet(
-                    item: $store.scope(
-                        state: \.yearMonthPicker,
-                        action: \.yearMonth
-                    )
-                ) { store in
-                    YearMonthPickerView(store: store)
-                        .presentationDetents([.fraction(0.3)])
-                }
-                .sheet(
-                    item: $store.scope(
-                        state: \.cabinList,
-                        action: \.selectedCabin
-                    )
-                ) { store in
-                    CabinView(store: store)
-                        .presentationDetents([.fraction(0.3)])
-                }
+            }
+            .navigationTitle("Airports")
+            .background(Color(AppColor.background))
+            .sheet(
+                item: $store.scope(
+                    state: \.airportList,
+                    action: \.list
+                )
+            ) { store in
+                AirportListView(store: store)
+            }
+            .sheet(
+                item: $store.scope(
+                    state: \.yearMonthPicker,
+                    action: \.yearMonth
+                )
+            ) { store in
+                YearMonthPickerView(store: store)
+                    .presentationDetents([.fraction(0.3)])
+            }
+            .sheet(
+                item: $store.scope(
+                    state: \.cabinList,
+                    action: \.selectedCabin
+                )
+            ) { store in
+                CabinView(store: store)
+                    .presentationDetents([.fraction(0.3)])
+            }
+        } destination: { store in
+            switch store.case {
+            case let .calendar(store):
+                CalendarView(store: store)
             }
         }
     }
@@ -234,7 +239,7 @@ struct HomeView: View {
     @ViewBuilder
     private var searchView: some View {
         Button {
-            
+            store.send(.toCalendar)
         } label: {
             Text("Search")
                 .font(.headline)
