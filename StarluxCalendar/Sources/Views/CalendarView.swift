@@ -9,13 +9,26 @@ import ComposableArchitecture
 import SwiftUI
 
 struct CalendarView: View {
-    let store: StoreOf<CalendarFeature>
+    @Bindable var store: StoreOf<CalendarFeature>
     
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
-            ScrollView {
-                Text("Hello")
-            }.navigationTitle("Calendar")
+            ZStack {
+                if viewStore.isLoading {
+                    ProgressView() {
+                        Text("Loading...")
+                    }
+                } else {
+                    ScrollView {
+                        Text("Hello")
+                    }
+                }
+            }
+            .alert($store.scope(state: \.alert, action: \.alert))
+            .navigationTitle("Calendar")
+            .onAppear {
+                store.send(.viewOnAppear)
+            }
         }
     }
 }

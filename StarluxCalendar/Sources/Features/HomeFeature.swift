@@ -20,8 +20,8 @@ struct HomeFeature {
         var departureType: DepartureType?
         
         @Presents var yearMonthPicker: YearMonthPickerFeature.State?
-        var selectedYear: Int = 2025
-        var selectedMonth: Int = 9
+        var selectedYear: Int = Date().year()
+        var selectedMonth: Int = Date().month()
         let years: [Int] = Array(2000...2030)
         let months: [Int] = Array(1...12)
         
@@ -154,7 +154,11 @@ struct HomeFeature {
         case .path(_):
             return .none
         case .toCalendar:
-            state.path.append(.calendar(.init()))
+            guard let fromCity = state.fromCity, let toCity = state.toCity else {
+                return .none
+            }
+            let date = Date.createDate(year: state.selectedYear, month: state.selectedMonth)
+            state.path.append(.calendar(.init(departureDate: date, cabin: state.selectedCabin, fromCity: fromCity, toCity: toCity)))
             return .none
         }
     }

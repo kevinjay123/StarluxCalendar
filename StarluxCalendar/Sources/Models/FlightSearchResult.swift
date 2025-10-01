@@ -8,37 +8,37 @@
 import Foundation
 
 // MARK: - Root
-struct FlightSearchResult: Codable {
+struct FlightSearchResult: Codable, Equatable {
     let success: Bool
     let traceId: String
-    let message: Message
-    let data: FlightData
+    let message: Message?
+    let data: FlightData?
     let links: String?
-    let meta: Meta
+    let meta: Meta?
 }
 
 // MARK: - Message
-struct Message: Codable {
+struct Message: Codable, Equatable {
     let code: String
     let content: String
-    let details: String?
+    let details: [String]?
 }
 
 // MARK: - FlightData
-struct FlightData: Codable {
+struct FlightData: Codable, Equatable {
     let flightInfo: FlightInfo
     let flights: [Flight]
     let availableCabins: AvailableCabins
 }
 
 // MARK: - FlightInfo
-struct FlightInfo: Codable {
+struct FlightInfo: Codable, Equatable {
     let departure: String
     let arrival: String
 }
 
 // MARK: - Flight
-struct Flight: Codable {
+struct Flight: Codable, Equatable {
     let flightDetails: [FlightDetail]
     let isDirect: Bool
     let flightNo: [String]
@@ -48,7 +48,7 @@ struct Flight: Codable {
 }
 
 // MARK: - FlightDetail
-struct FlightDetail: Codable {
+struct FlightDetail: Codable, Equatable {
     let id: String
     let departure: FlightEvent
     let arrival: FlightEvent
@@ -62,14 +62,14 @@ struct FlightDetail: Codable {
     let isPendingApproval: Bool
 }
 
-struct FlightEvent: Codable {
+struct FlightEvent: Codable, Equatable {
     let dateTime: String
     let airport: String
     let terminal: String
 }
 
 // MARK: - AirOffer
-struct AirOffer: Codable {
+struct AirOffer: Codable, Equatable {
     let id: String
     let cabin: String
     let flights: [OfferFlight]
@@ -79,7 +79,7 @@ struct AirOffer: Codable {
     let price: OfferPrice
 }
 
-struct OfferFlight: Codable {
+struct OfferFlight: Codable, Equatable {
     let id: String
     let cabin: String
     let bookingClass: String
@@ -87,35 +87,35 @@ struct OfferFlight: Codable {
     let fareProduct: FareProduct
 }
 
-struct FareProduct: Codable {
+struct FareProduct: Codable, Equatable {
     let mileageAccumulate: MileageAccumulate
     let mileageUpgrade: String
 }
 
-struct MileageAccumulate: Codable {
+struct MileageAccumulate: Codable, Equatable {
     let amount: Int
     let percentage: String
 }
 
-struct OfferPrice: Codable {
+struct OfferPrice: Codable, Equatable {
     let base: Price
     let totalTaxes: Price
     let total: Price
 }
 
-struct Price: Codable {
+struct Price: Codable, Equatable {
     let amount: Int
     let currencyCode: String
 }
 
 // MARK: - PriceInfo
-struct PriceInfo: Codable {
+struct PriceInfo: Codable, Equatable {
     let cabin: String
     let from: Price
 }
 
 // MARK: - AvailableCabins
-struct AvailableCabins: Codable {
+struct AvailableCabins: Codable, Equatable {
     let eco: Bool
     let ecoPremium: Bool
     let business: Bool
@@ -123,7 +123,7 @@ struct AvailableCabins: Codable {
 }
 
 // MARK: - Meta
-struct Meta: Codable {
+struct Meta: Codable, Equatable {
     let airports: [Airport]
     let currencies: [Currency]
     let aircraft: [Aircraft]
@@ -135,44 +135,44 @@ struct Meta: Codable {
 }
 
 // MARK: - Airport
-struct Airport: Codable {
+struct Airport: Codable, Equatable {
     let code: String
-    let name: String
+    let name: String?
     let city: City
     let country: Country
 }
 
-struct City: Codable {
+struct City: Codable, Equatable {
     let code: String
     let name: String
 }
 
-struct Country: Codable {
+struct Country: Codable, Equatable {
     let code: String
     let name: String
 }
 
 // MARK: - Currency
-struct Currency: Codable {
+struct Currency: Codable, Equatable {
     let code: String
     let decimalPlaces: Int
 }
 
 // MARK: - Aircraft
-struct Aircraft: Codable {
+struct Aircraft: Codable, Equatable {
     let code: String
     let aircraft: String
     let equipments: [String]
 }
 
 // MARK: - Cabin
-struct Cabin: Codable {
+struct Cabin: Codable, Equatable {
     let code: String
     let name: String
 }
 
 // MARK: - FareProductMeta
-struct FareProductMeta: Codable {
+struct FareProductMeta: Codable, Equatable {
     let fareFamilyCode: String
     let cabin: String
     let name: String
@@ -181,7 +181,7 @@ struct FareProductMeta: Codable {
     let fareRules: FareRules
 }
 
-struct FlightExperiences: Codable {
+struct FlightExperiences: Codable, Equatable {
     let seatSelection: String
     let checkedBaggage: String
     let carryOnBaggage: String
@@ -189,12 +189,12 @@ struct FlightExperiences: Codable {
     let internet: String
 }
 
-struct Cosmile: Codable {
+struct Cosmile: Codable, Equatable {
     let mileageAccumulate: String
     let upgradeAward: String
 }
 
-struct FareRules: Codable {
+struct FareRules: Codable, Equatable {
     let validity: String
     let reissueFee: String
     let refundFee: String
@@ -202,18 +202,18 @@ struct FareRules: Codable {
 }
 
 // MARK: - BookingClass
-struct BookingClass: Codable {
+struct BookingClass: Codable, Equatable {
     let code: String
     let name: String
 }
 
 // MARK: - FlightEmission
-struct FlightEmission: Codable {
+struct FlightEmission: Codable, Equatable {
     let id: String
     let emissionsGramsPerPax: EmissionsGramsPerPax
 }
 
-struct EmissionsGramsPerPax: Codable {
+struct EmissionsGramsPerPax: Codable, Equatable {
     let first: Int
     let business: Int
     let premiumEconomy: Int
@@ -221,25 +221,25 @@ struct EmissionsGramsPerPax: Codable {
 }
 
 // MARK: - BaggagePolicy
-struct BaggagePolicy: Codable {
+struct BaggagePolicy: Codable, Equatable {
     let id: String
     let marketingAirlineCode: String
     let type: String
     let details: BaggageDetails
 }
 
-struct BaggageDetails: Codable {
+struct BaggageDetails: Codable, Equatable {
     let type: String
     let quantity: Int
     let characteristics: [BaggageCharacteristic]
 }
 
-struct BaggageCharacteristic: Codable {
+struct BaggageCharacteristic: Codable, Equatable {
     let description: String
     let policyDetails: [PolicyDetail]
 }
 
-struct PolicyDetail: Codable {
+struct PolicyDetail: Codable, Equatable {
     let type: String
     let qualifier: String
     let value: String
