@@ -21,42 +21,46 @@ struct CalendarView: View {
                         Text("Loading...")
                     }
                 } else {
-                    VStack(spacing: 0) {
-                        LazyVGrid(columns: columns) {
-                            ForEach(viewStore.weekdays) { weekday in
-                                Text(LocalizedStringKey(weekday.titleCatelog))
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                    .frame(height: 24, alignment: .center)
-                            }
-                        }.padding(16)
-                        
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(viewStore.calendarItems) { day in
-                                VStack {
-                                    Text(day.departureDate.suffix(2)) // 只顯示日
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            LazyVGrid(columns: columns) {
+                                ForEach(viewStore.weekdays) { weekday in
+                                    Text(LocalizedStringKey(weekday.titleCatelog))
                                         .font(.headline)
-                                        .foregroundColor(day.status == "available" ? .black : .gray)
-                                                    
-                                    if let price = day.price, day.status == "available" {
-                                        Text("\(price.amount)")
-                                            .font(.caption2)
-                                            .foregroundColor(day.color)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
-                                        Text("\(price.currencyCode)")
-                                            .font(.caption2)
-                                            .foregroundColor(day.color)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
-                                    }
+                                        .foregroundColor(.black)
+                                        .frame(height: 24, alignment: .center)
                                 }
-                                .padding(8)
-                                .cornerRadius(8)
+                            }.padding(16)
+                            
+                            LazyVGrid(columns: columns, spacing: 12) {
+                                ForEach(viewStore.calendarItems) { day in
+                                    VStack {
+                                        Text(day.departureDate.suffix(2)) // 只顯示日
+                                            .font(.headline)
+                                            .foregroundColor(day.status == "available" ? .black : .gray)
+                                                        
+                                        if let price = day.price, day.status == "available" {
+                                            Text("\(price.amount)")
+                                                .font(.caption2)
+                                                .foregroundColor(day.color)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                            Text("\(price.currencyCode)")
+                                                .font(.caption2)
+                                                .foregroundColor(day.color)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                        }
+                                    }
+                                    .padding(8)
+                                    .cornerRadius(8)
+                                }
                             }
+                            .padding()
                         }
-                        .padding()
                     }
+                    .padding(.top, 24)
+                    .frame(maxWidth: .infinity, alignment: .top)
                 }
             }
             .alert($store.scope(state: \.alert, action: \.alert))
