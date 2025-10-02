@@ -84,12 +84,18 @@ extension Date {
         return c.range(of: .weekOfMonth, in: .month, for: self)!.count
     }
     
+    func dateFrom(_ string: String, format: DateFormats = .yyyyMMdd) -> Date? {
+        let df = DateFormatter()
+        df.dateFormat = format.rawValue
+        return df.date(from: string)
+    }
+    
     static func createDate(year: Int, month: Int) -> Date {
         let components = DateComponents(year: year, month: month, day: 1)
         return Calendar.current.date(from: components) ?? Date()
     }
     
-    enum WeekDay: Int, CaseIterable {
+    enum WeekDay: Int, CaseIterable, Identifiable {
         case sunday = 1
         case monday = 2
         case tuesday = 3
@@ -115,6 +121,10 @@ extension Date {
             case .saturday:
                 return "Weekday_Saturday"
             }
+        }
+        
+        var id: UUID {
+            return UUID()
         }
     }
 }

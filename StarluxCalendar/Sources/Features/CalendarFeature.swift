@@ -18,7 +18,10 @@ struct CalendarFeature {
         var fromCity: AirportModel
         var toCity: AirportModel
         var isLoading: Bool = false
-        var monthResult: FlightMonthResult?
+        var calendarItems: [Item] = []
+        var maxValue: Int?
+        var minValue: Int?
+        var weekdays: [Date.WeekDay] = []
         @Presents var alert: AlertState<Action.Alert>?
     }
     
@@ -51,18 +54,24 @@ struct CalendarFeature {
             let toCity = state.toCity
             let cabin = state.cabin
             
-            return .run { send in
-                do {
-                    let result = try await networkService.search(
-                        departureDate: date,
-                        fromCity: fromCity.code,
-                        toCity: toCity.code,
-                        cabin: cabin.rawValue
-                    )
-                    
-                    await send(.calendarRequest(result))
-                } catch {
-                    await send(.apiResponse(.failure(.loadingFailed(error.localizedDescription))))
+            if fromCity.code == "TPE" || fromCity.code == "RMQ" {
+                return .run { send in
+                    await send(.calendarRequest(nil))
+                }
+            } else {
+                return .run { send in
+                    do {
+                        let result = try await networkService.search(
+                            departureDate: date,
+                            fromCity: fromCity.code,
+                            toCity: toCity.code,
+                            cabin: cabin.rawValue
+                        )
+
+                        await send(.calendarRequest(result))
+                    } catch {
+                        await send(.apiResponse(.failure(.loadingFailed(error.localizedDescription))))
+                    }
                 }
             }
             
@@ -92,7 +101,14 @@ struct CalendarFeature {
             }
         case let .apiResponse(.success(result)):
             state.isLoading = false
-            state.monthResult = result
+            let maxValue = result?.data.calendars.compactMap { $0.price?.amount }.max()
+            let minValue = result?.data.calendars.compactMap { $0.price?.amount }.min()
+            
+            state.calendarItems = generateCalendarItem(
+                maxValue: maxValue,
+                minValue: minValue,
+                calendarItems: result?.data.calendars ?? []
+            )
             return .none
         case let .apiResponse(.failure(error)):
             state.isLoading = false
@@ -106,5 +122,86 @@ struct CalendarFeature {
         case .alert:
             return .none
         }
+        
+        func generateCalendarItem(maxValue: Int?, minValue: Int?, calendarItems: [CalendarItem]) -> [Item] {
+            var allCases = Date.WeekDay.allCases
+            allCases.move(fromOffsets: IndexSet(integer: 0), toOffset: allCases.count)
+            state.weekdays = allCases
+            
+            var reportInfos = calendarItems
+            var items: [Item] = []
+            let weekdayBaseCount = 7
+            let selectedDate = state.departureDate
+            
+            /// 目前這個月有幾天
+            let daysInMonth = selectedDate.daysInMonth
+            
+            /// 這個月的第一天
+            let firstDayOfMonth = selectedDate.startOfMonth
+            
+            /// 這個月有幾週
+            let weeksInMonth = selectedDate.getWeeksInMonth(startWith: .monday)
+            
+            /// 這個月第一天是星期幾
+            /// WeekDay 回傳數字邏輯：星期日為 1、星期一為 2，以此類推...
+            let startingSpaces = firstDayOfMonth.getWeekday(startWith: .monday)
+
+            /// 本行事曆每週第一天從星期一開始計算
+            var count = Date.WeekDay.monday.rawValue
+            
+            /// 因為從星期一開始計算，故行事曆格數最大值需 + 1
+            let maximumDaysInGrid = weeksInMonth * weekdayBaseCount + 1
+            
+            /// 產生行事曆
+            while count <= maximumDaysInGrid {
+                /// 補足當月第一天以前的空白天數
+                if count <= startingSpaces {
+                    items.append(Item())
+                } else {
+                    /// 將預設值減第一天以前的空白天數，即為所在日期
+                    let calendarDay = count - startingSpaces
+                    
+                    if calendarDay <= daysInMonth {
+                        
+                        /// 行事曆預設資料
+                        var item = Item(departureDate: String(calendarDay))
+                        
+                        /// 將 API 資料塞進行事曆
+                        if let calendar = reportInfos.first {
+                            let color: Color
+                            if calendar.price?.amount == maxValue {
+                                color = .red
+                            } else if calendar.price?.amount == minValue {
+                                color = .green
+                            } else {
+                                color = .gray
+                            }
+                            
+                            item.status = calendar.status
+                            item.price = calendar.price
+                            item.color = color
+                            
+                            reportInfos.removeFirst()
+                        }
+                        
+                        items.append(item)
+                    }
+                }
+                
+                /// 依序將預設值 +1，直到跑完整個月份
+                count += 1
+            }
+            
+            return items
+        }
     }
+}
+
+struct Item: Equatable, Identifiable {
+    var id: UUID = UUID()
+    var departureDate: String = ""
+    var status: String = ""
+    var reason: String = ""
+    var price: Price? = Price(amount: 0, currencyCode: "")
+    var color: Color = .white
 }
