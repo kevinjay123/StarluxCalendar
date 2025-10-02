@@ -8,7 +8,7 @@
 
 A modern SwiftUI project for flight date and price calendar selection, built with the Composable Architecture (TCA) and best practices for scalable state management and API integration.
 
-![image](https://github.com/kevinjay123/StarluxCalendar/blob/main/Image/all.jpg)
+![image](https://github.com/kevinjay123/StarluxCalendar/blob/main/Image/all.png)
 
 ## Technology Stack
 
