@@ -34,8 +34,8 @@ struct CalendarView: View {
                             
                             LazyVGrid(columns: columns, spacing: 12) {
                                 ForEach(viewStore.calendarItems) { day in
-                                    VStack {
-                                        Text(day.departureDate.suffix(2)) // 只顯示日
+                                    VStack(spacing: 0) {
+                                        Text(day.departureDate)
                                             .font(.headline)
                                             .foregroundColor(day.status == "available" ? .black : .gray)
                                                         
@@ -50,6 +50,19 @@ struct CalendarView: View {
                                                 .foregroundColor(day.color)
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
+                                        } else if !day.departureDate.isEmpty {
+                                            Text("No")
+                                                .font(.body)
+                                                .foregroundColor(.gray)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                                .frame(height: 12)
+                                            Text("Price")
+                                                .font(.body)
+                                                .foregroundColor(.gray)
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                                .frame(height: 12)
                                         }
                                     }
                                     .padding(8)
@@ -59,12 +72,12 @@ struct CalendarView: View {
                             .padding()
                         }
                     }
-                    .padding(.top, 24)
+                    .padding(.top, 0)
                     .frame(maxWidth: .infinity, alignment: .top)
                 }
             }
             .alert($store.scope(state: \.alert, action: \.alert))
-            .navigationTitle("Calendar")
+            .navigationTitle("\(viewStore.departureDate.getDateStringFromUTC(.yyyyMMWithSlash))")
             .onAppear {
                 store.send(.viewOnAppear)
             }
