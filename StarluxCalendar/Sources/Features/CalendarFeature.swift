@@ -49,12 +49,13 @@ struct CalendarFeature {
         case .viewOnAppear:
             state.isLoading = true
             
+            let isDeptureFromTaiwan = state.fromCity.code == "TPE" || state.fromCity.code == "RMQ"
             let date = state.departureDate
-            let fromCity = state.fromCity
-            let toCity = state.toCity
+            let fromCity = isDeptureFromTaiwan ? state.fromCity : state.toCity
+            let toCity = isDeptureFromTaiwan ? state.toCity : state.fromCity
             let cabin = state.cabin
             
-            if fromCity.code == "TPE" || fromCity.code == "RMQ" {
+            if isDeptureFromTaiwan {
                 return .run { send in
                     await send(.calendarRequest(nil))
                 }
@@ -80,8 +81,8 @@ struct CalendarFeature {
             
             let code = result?.meta?.fareProducts.filter({ $0.cabin == state.cabin.rawValue }).first?.fareFamilyCode ?? ""
             let date = state.departureDate
-            let fromCity = state.fromCity
-            let toCity = state.toCity
+            let fromCity = result == nil ? state.fromCity : state.toCity
+            let toCity = result == nil ? state.toCity : state.fromCity
             let cabin = state.cabin
             
             return .run { send in
