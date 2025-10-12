@@ -38,6 +38,7 @@ struct CalendarFeature {
     }
     
     @Dependency(\.networkService) var networkService
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         Reduce(core)
@@ -121,7 +122,7 @@ struct CalendarFeature {
 
             return .none
         case .alert:
-            return .none
+            return .run { _ in await self.dismiss() }
         }
         
         func generateCalendarItem(maxValue: Int?, minValue: Int?, calendarItems: [CalendarItem]) -> [Item] {
