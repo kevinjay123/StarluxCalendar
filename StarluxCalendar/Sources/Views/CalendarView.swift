@@ -24,7 +24,7 @@ struct CalendarView: View {
                     ScrollView {
                         VStack(spacing: 0) {
                             LazyVGrid(columns: columns) {
-                                ForEach(viewStore.weekdays) { weekday in
+                                ForEach(viewStore.weekdays, id: \.self) { weekday in
                                     Text(LocalizedStringKey(weekday.titleCatelog))
                                         .font(.headline)
                                         .foregroundColor(.black)
@@ -33,7 +33,7 @@ struct CalendarView: View {
                             }.padding(16)
                             
                             LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(viewStore.calendarItems) { day in
+                                ForEach(viewStore.calendarItems, id: \.id) { day in
                                     VStack(spacing: 0) {
                                         Text(day.departureDate)
                                             .font(.headline)

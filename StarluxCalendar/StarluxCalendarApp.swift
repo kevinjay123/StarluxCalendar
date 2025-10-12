@@ -18,7 +18,7 @@ struct StarluxCalendarApp: App {
                     reducer: {
                         AppFeature()
                 })
-            )
+            ).preferredColorScheme(.light)
         }
     }
 }
