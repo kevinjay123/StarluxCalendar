@@ -35,9 +35,15 @@ struct CalendarView: View {
                             LazyVGrid(columns: columns, spacing: 12) {
                                 ForEach(viewStore.calendarItems, id: \.id) { day in
                                     VStack(spacing: 0) {
-                                        Text(day.departureDate)
-                                            .font(.headline)
-                                            .foregroundColor(day.status == "available" ? .black : .gray)
+                                        if day.status == "available" {
+                                            Text(day.departureDate)
+                                                .font(.headline)
+                                                .foregroundColor(day.isHoliday ? .red : .black)
+                                        } else {
+                                            Text(day.departureDate)
+                                                .font(.headline)
+                                                .foregroundColor(.gray)
+                                        }
                                                         
                                         if let price = day.price, day.status == "available" {
                                             Text("\(price.amount)")

@@ -54,17 +54,6 @@
         }
       }
     },
-    "Calendar" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日曆"
-          }
-        }
-      }
-    },
     "Cancel" : {
       "localizations" : {
         "zh-Hant" : {

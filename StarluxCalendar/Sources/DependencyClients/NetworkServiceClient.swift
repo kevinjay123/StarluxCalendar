@@ -15,6 +15,7 @@ enum NetworkError: Error, Equatable {
 protocol NetworkService {
     func search(departureDate: Date, fromCity: String, toCity: String, cabin: String) async throws -> FlightSearchResult?
     func calendar(departureDate: Date, fromCity: String, toCity: String, cabin: String, goFareFamilyCode: String) async throws -> FlightMonthResult?
+    func holiday() async throws -> [Holiday]?
 }
 
 struct NetworkServiceClient: NetworkService {
@@ -66,6 +67,10 @@ extension NetworkServiceClient {
                 goFareFamilyCode: goFareFamilyCode
             )
         )
+    }
+    
+    func holiday() async throws -> [Holiday]? {
+        return try await request(by: APIConfig.holiday)
     }
 }
 

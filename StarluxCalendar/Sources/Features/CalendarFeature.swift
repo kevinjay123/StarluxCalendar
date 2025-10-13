@@ -26,10 +26,32 @@ struct CalendarFeature {
     }
     
     enum Action: Equatable {
+        static func == (lhs: CalendarFeature.Action, rhs: CalendarFeature.Action) -> Bool {
+            switch (lhs, rhs) {
+            case let (.alert(l), .alert(r)):
+                return l == r
+            case (.viewOnAppear, .viewOnAppear):
+                return true
+            case let (.calendarRequest(l), .calendarRequest(r)):
+                return l == r
+            case let (.apiResponse(l), .apiResponse(r)):
+                switch (l, r) {
+                case (.success(let lv), .success(let rv)):
+                    return lv == rv
+                case (.failure(let le), .failure(let re)):
+                    return String(reflecting: le) == String(reflecting: re)
+                default:
+                    return false
+                }
+            default:
+                return false
+            }
+        }
+        
         case alert(PresentationAction<Alert>)
         case viewOnAppear
         case calendarRequest(FlightSearchResult?)
-        case apiResponse(Result<FlightMonthResult?, NetworkError>)
+        case apiResponse(Result<(FlightMonthResult?, [Holiday]?), NetworkError>)
         
         @CasePathable
         enum Alert {
@@ -50,13 +72,13 @@ struct CalendarFeature {
         case .viewOnAppear:
             state.isLoading = true
             
-            let isDeptureFromTaiwan = state.fromCity.code == "TPE" || state.fromCity.code == "RMQ"
+            let isDepartureFromTaiwan = state.fromCity.code == "TPE" || state.fromCity.code == "RMQ"
             let date = state.departureDate
-            let fromCity = isDeptureFromTaiwan ? state.fromCity : state.toCity
-            let toCity = isDeptureFromTaiwan ? state.toCity : state.fromCity
+            let fromCity = isDepartureFromTaiwan ? state.fromCity : state.toCity
+            let toCity = isDepartureFromTaiwan ? state.toCity : state.fromCity
             let cabin = state.cabin
             
-            if isDeptureFromTaiwan {
+            if isDepartureFromTaiwan {
                 return .run { send in
                     await send(.calendarRequest(nil))
                 }
@@ -88,7 +110,7 @@ struct CalendarFeature {
             
             return .run { send in
                 do {
-                    let result = try await networkService.calendar(
+                    async let calendarResult = await networkService.calendar(
                         departureDate: date,
                         fromCity: fromCity.code,
                         toCity: toCity.code,
@@ -96,20 +118,24 @@ struct CalendarFeature {
                         goFareFamilyCode: code
                     )
                     
-                    await send(.apiResponse(.success(result)))
+                    async let holidayResult = await networkService.holiday()
+                    
+                    try await send(.apiResponse(.success((calendarResult, holidayResult))))
                 } catch {
                     await send(.apiResponse(.failure(.loadingFailed(error.localizedDescription))))
                 }
             }
-        case let .apiResponse(.success(result)):
+        case let .apiResponse(.success((calendarResult, holidayResult))):
             state.isLoading = false
-            let maxValue = result?.data.calendars.compactMap { $0.price?.amount }.max()
-            let minValue = result?.data.calendars.compactMap { $0.price?.amount }.min()
+            let maxValue = calendarResult?.data.calendars.compactMap { $0.price?.amount }.max()
+            let minValue = calendarResult?.data.calendars.compactMap { $0.price?.amount }.min()
+            let holidays = generateCurrentHolidays(departureDate: state.departureDate, result: holidayResult)
             
             state.calendarItems = generateCalendarItem(
                 maxValue: maxValue,
                 minValue: minValue,
-                calendarItems: result?.data.calendars ?? []
+                calendarItems: calendarResult?.data.calendars ?? [],
+                holidays: holidays
             )
             return .none
         case let .apiResponse(.failure(error)):
@@ -125,7 +151,29 @@ struct CalendarFeature {
             return .run { _ in await self.dismiss() }
         }
         
-        func generateCalendarItem(maxValue: Int?, minValue: Int?, calendarItems: [CalendarItem]) -> [Item] {
+        func generateCurrentHolidays(departureDate: Date, result: [Holiday]?) -> [Int: Holiday?] {
+            guard let result else { return [:] }
+            
+            var holidays: [Int: Holiday?] = [:]
+            
+            for holiday in result {
+                if let date = Date().dateFrom(holiday.date ?? "", format: .yMd),
+                    date.year() == departureDate.year(),
+                    date.month() == departureDate.month()
+                {
+                    holidays[date.day()] = holiday
+                }
+            }
+            
+            return holidays
+        }
+        
+        func generateCalendarItem(
+            maxValue: Int?,
+            minValue: Int?,
+            calendarItems: [CalendarItem],
+            holidays: [Int: Holiday?]
+        ) -> [Item] {
             var allCases = Date.WeekDay.allCases
             allCases.move(fromOffsets: IndexSet(integer: 0), toOffset: allCases.count)
             state.weekdays = allCases
@@ -182,7 +230,7 @@ struct CalendarFeature {
                             item.status = calendar.status
                             item.price = calendar.price
                             item.color = color
-                            
+                            item.isHoliday = holidays[calendarDay] != nil
                             reportInfos.removeFirst()
                         }
                         
@@ -197,13 +245,4 @@ struct CalendarFeature {
             return items
         }
     }
-}
-
-struct Item: Equatable, Identifiable {
-    var id: UUID = UUID()
-    var departureDate: String = ""
-    var status: String = ""
-    var reason: String = ""
-    var price: Price? = Price(amount: 0, currencyCode: "")
-    var color: Color = .white
 }

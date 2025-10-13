@@ -10,6 +10,7 @@ import Foundation
 enum APIConfig {
     case searchFlight(departureDate: Date, fromCity: String, toCity: String, cabin: String)
     case calendar(departureDate: Date, fromCity: String, toCity: String, cabin: String, goFareFamilyCode: String)
+    case holiday
     
     private static let baseUrl = "https://ecapi.starlux-airlines.com/searchFlight/v2/flights"
     
@@ -19,12 +20,14 @@ enum APIConfig {
             return URL(string: "\(APIConfig.baseUrl)/search")!
         case .calendar:
             return URL(string: "\(APIConfig.baseUrl)/calendars/monthly")!
+        case .holiday:
+            return URL(string: "https://opensheet.elk.sh/1yC_pjiP0orcMqRy0rpymMjDpISJhiJBcMoOmCowru84/taiwan-calendar")!
         }
     }
     
     var method: String {
         switch self {
-        case .searchFlight, .calendar:
+        case .searchFlight, .calendar, .holiday:
             return "POST"
         }
     }
@@ -35,6 +38,8 @@ enum APIConfig {
             return ["Content-Type": "application/json",
                     "jx-lang": "zh-TW",
                     "X-Requested-With": "XMLHttpRequest"]
+        case .holiday:
+            return ["Content-Type": "application/json"]
         }
     }
     
@@ -104,6 +109,8 @@ enum APIConfig {
             )
             
             return try? JSONEncoder().encode(requestBody)
+        case .holiday:
+            return nil
         }
     }
 
@@ -111,7 +118,10 @@ enum APIConfig {
         var req = URLRequest(url: url)
         req.httpMethod = method
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
-        req.httpBody = body
+        
+        if let body {
+            req.httpBody = body
+        }
         return req
     }
 }
