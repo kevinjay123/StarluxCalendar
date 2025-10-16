@@ -2,13 +2,17 @@
 
 [![Swift](https://img.shields.io/badge/swift-5.8-brightgreen.svg)](https://developer.apple.com/swift/)
 [![SwiftUI](https://img.shields.io/badge/-SwiftUI-ff69b4)](https://developer.apple.com/documentation/swiftui)
-![iOS 17](https://img.shields.io/badge/-iOS%2017-blue)
+![iOS 18](https://img.shields.io/badge/-iOS%2018-blue)
 [![The Composable Architecture](https://img.shields.io/badge/-TCA-blue)](https://developer.apple.com/ios/)
 [![license](https://img.shields.io/badge/license-mit-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
 A modern SwiftUI project for flight date and price calendar selection, built with the Composable Architecture (TCA) and best practices for scalable state management and API integration.
 
 ![image](https://github.com/kevinjay123/StarluxCalendar/blob/main/Image/all.png)
+
+## Framework Versions
+- The Composable Architecture (TCA) version: **1.23.0**
+- iOS minimum deployment target: **18.4**
 
 ## Technology Stack
 
@@ -35,3 +39,16 @@ This project fully adopts [TCA](https://github.com/pointfreeco/swift-composable-
 
 - Comprehensive tests on each reducer covering modal interactions, city swapping, API loading, and navigation stack pushing.
 - Strict TCA modal action/state clearing order to ensure stable and precise tests.
+
+## Installation
+To get started with the project:
+1.	**Fetch the repository using Git:**
+
+```bash
+git clone https://github.com/kevinjay123/StarluxCalendar.git
+cd StarluxCalendar
+```
+
+2.	**Build and run the project:** 
+
+    Open `StarluxCalendar.xcodeproj` in Xcode, then build and run it on a simulator or device running iOS 18.4 or later.
