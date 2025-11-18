@@ -7,7 +7,7 @@ struct AppFeature {
         var home: HomeFeature.State = .init()
     }
     
-    enum Action: Equatable {
+    enum Action {
         case home(HomeFeature.Action)
     }
     

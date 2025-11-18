@@ -25,29 +25,7 @@ struct CalendarFeature {
         @Presents var alert: AlertState<Action.Alert>?
     }
     
-    enum Action: Equatable {
-        static func == (lhs: CalendarFeature.Action, rhs: CalendarFeature.Action) -> Bool {
-            switch (lhs, rhs) {
-            case let (.alert(l), .alert(r)):
-                return l == r
-            case (.viewOnAppear, .viewOnAppear):
-                return true
-            case let (.calendarRequest(l), .calendarRequest(r)):
-                return l == r
-            case let (.apiResponse(l), .apiResponse(r)):
-                switch (l, r) {
-                case (.success(let lv), .success(let rv)):
-                    return lv == rv
-                case (.failure(let le), .failure(let re)):
-                    return String(reflecting: le) == String(reflecting: re)
-                default:
-                    return false
-                }
-            default:
-                return false
-            }
-        }
-        
+    enum Action {
         case alert(PresentationAction<Alert>)
         case viewOnAppear
         case calendarRequest(FlightSearchResult?)

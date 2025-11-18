@@ -9,8 +9,10 @@ import Foundation
 import ComposableArchitecture
 
 extension HomeFeature {
-    @Reducer(state: .equatable, action: .equatable)
+    @Reducer
     enum Path {
         case calendar(CalendarFeature)
     }
 }
+
+extension HomeFeature.Path.State: Equatable { }

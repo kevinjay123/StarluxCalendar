@@ -32,7 +32,7 @@ struct HomeFeature {
         var path = StackState<Path.State>()
     }
     
-    enum Action: Equatable {
+    enum Action {
         case scenePhaseBecomeActive
         case swapAirport
         case airportsResponse(Result<[AirportModel], AirportError>)
