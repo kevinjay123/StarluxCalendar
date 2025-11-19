@@ -4,6 +4,22 @@
     "%@" : {
       "shouldTranslate" : false
     },
+    "%@ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ to %2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 前往 %2$@"
+          }
+        }
+      }
+    },
     "%@/%@" : {
       "localizations" : {
         "en" : {

@@ -15,6 +15,15 @@ struct CalendarView: View {
     
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
+            VStack {
+                calenderView
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var calenderView: some View {
+        WithViewStore(store, observe: { $0 }) { viewStore in
             ZStack {
                 if viewStore.isLoading {
                     ProgressView() {
@@ -23,6 +32,16 @@ struct CalendarView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 0) {
+                            Text("\(viewStore.fromCity.code) to \(viewStore.toCity.code)")
+                                .font(.title2)
+                                .foregroundColor(.black)
+                                .padding(16)
+                                .frame(maxWidth: .infinity, maxHeight: 48, alignment: .leading)
+                            
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(Color(hex: AppColor.border.rawValue))
+                            
                             LazyVGrid(columns: columns) {
                                 ForEach(viewStore.weekdays, id: \.self) { weekday in
                                     Text(LocalizedStringKey(weekday.titleCatelog))
@@ -90,3 +109,4 @@ struct CalendarView: View {
         }
     }
 }
+

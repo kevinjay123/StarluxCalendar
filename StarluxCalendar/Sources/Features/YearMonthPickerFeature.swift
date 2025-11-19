@@ -22,7 +22,7 @@ struct YearMonthPickerFeature: Reducer {
         }
     }
     
-    enum Action: Equatable {
+    enum Action {
         case selectYear(Int)
         case selectMonth(Int)
         case confirm

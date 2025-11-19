@@ -16,7 +16,7 @@ struct AirportListFeature {
         var selectedItem: AirportModel? = nil
     }
     
-    enum Action: Equatable {
+    enum Action {
         case selectItem(AirportModel)
         case cancel
     }
