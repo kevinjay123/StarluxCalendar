@@ -11,7 +11,7 @@ A modern SwiftUI project for flight date and price calendar selection, built wit
 ![image](https://github.com/kevinjay123/StarluxCalendar/blob/main/Image/all.png)
 
 ## Framework Versions
-- The Composable Architecture (TCA) version: **1.23.0**
+- The Composable Architecture (TCA) version: **1.23.1**
 - iOS minimum deployment target: **18.4**
 
 ## Technology Stack
