@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2D0DA3142E83BE7900FC415B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 2D0DA3132E83BE7900FC415B /* ComposableArchitecture */; };
+		2D8ACC712F69239600E60BE3 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 2D8ACC702F69239600E60BE3 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2D0DA3142E83BE7900FC415B /* ComposableArchitecture in Frameworks */,
+				2D8ACC712F69239600E60BE3 /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +125,7 @@
 			);
 			name = StarluxCalendar;
 			packageProductDependencies = (
-				2D0DA3132E83BE7900FC415B /* ComposableArchitecture */,
+				2D8ACC702F69239600E60BE3 /* ComposableArchitecture */,
 			);
 			productName = StarluxCalendar;
 			productReference = 2D324F222E58575C0097076B /* StarluxCalendar.app */;
@@ -211,7 +211,7 @@
 			mainGroup = 2D324F192E58575C0097076B;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2D0DA3122E83BE7900FC415B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				2D8ACC6F2F69239600E60BE3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2D324F232E58575C0097076B /* Products */;
@@ -623,20 +623,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2D0DA3122E83BE7900FC415B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+		2D8ACC6F2F69239600E60BE3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
-				kind = exactVersion;
-				version = 1.23.1;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.25.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2D0DA3132E83BE7900FC415B /* ComposableArchitecture */ = {
+		2D8ACC702F69239600E60BE3 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2D0DA3122E83BE7900FC415B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			package = 2D8ACC6F2F69239600E60BE3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */

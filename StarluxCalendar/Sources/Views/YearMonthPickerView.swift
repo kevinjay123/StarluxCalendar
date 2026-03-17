@@ -13,43 +13,41 @@ struct YearMonthPickerView: View {
     let store: StoreOf<YearMonthPickerFeature>
     
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            HStack {
-                Picker("Year", selection: viewStore.binding(
-                    get: \.year,
-                    send: YearMonthPickerFeature.Action.selectYear
-                )) {
-                    ForEach(viewStore.years, id: \.self) { year in
-                        Text("\(year)")
-                    }
+        HStack {
+            Picker("Year", selection: Binding(
+                get: { store.year },
+                set: { store.send(.selectYear($0)) }
+            )) {
+                ForEach(store.years, id: \.self) { year in
+                    Text("\(year)")
                 }
-                .frame(width: 100)
-                
-                Picker("Month", selection: viewStore.binding(
-                    get: \.month,
-                    send: YearMonthPickerFeature.Action.selectMonth
-                )) {
-                    ForEach(viewStore.months, id: \.self) { month in
-                        Text(String(format: "%02d", month))
-                    }
-                }
-                .frame(width: 80)
             }
-            .pickerStyle(.wheel)
+            .frame(width: 100)
             
-            Button {
-                viewStore.send(.confirm)
-            } label: {
-                Text("Confirm")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
+            Picker("Month", selection: Binding(
+                get: { store.month },
+                set: { store.send(.selectMonth($0)) }
+            )) {
+                ForEach(store.months, id: \.self) { month in
+                    Text(String(format: "%02d", month))
+                }
             }
-            .background(Color.blue)
-            .cornerRadius(16)
-            .padding(.horizontal)
+            .frame(width: 80)
         }
+        .pickerStyle(.wheel)
+        
+        Button {
+            store.send(.confirm)
+        } label: {
+            Text("Confirm")
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+        }
+        .background(Color.blue)
+        .cornerRadius(16)
+        .padding(.horizontal)
     }
 }

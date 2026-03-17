@@ -12,14 +12,12 @@ struct CabinView: View {
     let store: StoreOf<CabinFeature>
 
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            List(viewStore.cabins ?? []) { cabin in
-                Text(LocalizedStringKey(cabin.rawValue))
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        viewStore.send(.selectItem(cabin))
-                    }
-            }
+        List(store.cabins ?? []) { cabin in
+            Text(LocalizedStringKey(cabin.rawValue))
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    store.send(.selectItem(cabin))
+                }
         }
     }
 }

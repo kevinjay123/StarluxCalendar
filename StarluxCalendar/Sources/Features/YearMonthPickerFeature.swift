@@ -10,6 +10,8 @@ import Foundation
 import SwiftUI
 
 struct YearMonthPickerFeature: Reducer {
+    
+    @ObservableState
     struct State: Equatable {
         var year: Int
         var month: Int

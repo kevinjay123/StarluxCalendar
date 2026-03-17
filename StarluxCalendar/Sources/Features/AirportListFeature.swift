@@ -11,6 +11,8 @@ import SwiftUI
 
 @Reducer
 struct AirportListFeature {
+    
+    @ObservableState
     struct State: Equatable {
         var items: [AirportModel]?
         var selectedItem: AirportModel? = nil

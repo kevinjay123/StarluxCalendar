@@ -11,6 +11,8 @@ import SwiftUI
 
 @Reducer
 struct CabinFeature {
+    
+    @ObservableState
     struct State: Equatable {
         var cabins: [CabinType]?
         var selectedCabin: CabinType? = nil
