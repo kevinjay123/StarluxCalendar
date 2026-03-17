@@ -27,12 +27,12 @@ struct HomeView: View {
                 }
                 .padding(.top, 24)
                 .frame(maxWidth: .infinity, alignment: .top)
+                .task {
+                    store.send(.scenePhaseBecomeActive)
+                }
                 .onChange(of: scenePhase) { _, newValue in
-                    switch newValue {
-                    case .active:
+                    if newValue == .active {
                         store.send(.scenePhaseBecomeActive)
-                    default:
-                        break
                     }
                 }
             }

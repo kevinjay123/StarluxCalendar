@@ -123,8 +123,8 @@ extension Date {
             }
         }
         
-        var id: UUID {
-            return UUID()
+        var id: Int {
+            rawValue
         }
     }
 }

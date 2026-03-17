@@ -34,12 +34,12 @@ struct DataModel: Codable, Equatable {
 }
 
 struct CalendarItem: Codable, Equatable, Identifiable {
-    var id: UUID = UUID()
-    
     let departureDate: String
     let status: String
     let reason: String?
     let price: Price?
+
+    var id: String { departureDate }
     
     enum CodingKeys: String, CodingKey {
         case departureDate

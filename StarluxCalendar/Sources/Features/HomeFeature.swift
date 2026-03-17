@@ -15,6 +15,8 @@ struct HomeFeature {
     struct State: Equatable {
         @Presents var airportList: AirportListFeature.State?
         var airports: [AirportModel] = []
+        var hasLoadedAirports = false
+        var isLoadingAirports = false
         var fromCity: AirportModel?
         var toCity: AirportModel?
         var departureType: DepartureType?
@@ -125,6 +127,11 @@ struct HomeFeature {
             state.cabinList = nil
             return .none
         case .scenePhaseBecomeActive:
+            guard !state.hasLoadedAirports, !state.isLoadingAirports else {
+                return .none
+            }
+
+            state.isLoadingAirports = true
             return .run { send in
                 do {
                     let airports = try await airportService.loadAirports()
@@ -134,18 +141,22 @@ struct HomeFeature {
                 }
             }
         case let .airportsResponse(.success(airports)):
+            state.isLoadingAirports = false
+            state.hasLoadedAirports = true
             state.airports = airports
-            
-            if let tpeCity = airports.filter({ $0.code == "TPE" }).first {
+
+            if let tpeCity = airports.first(where: { $0.code == "TPE" }) {
                 state.fromCity = tpeCity
             }
-            
-            if let nrtCity = airports.filter({ $0.code == "NRT" }).first {
+
+            if let nrtCity = airports.first(where: { $0.code == "NRT" }) {
                 state.toCity = nrtCity
             }
-            
+
             return .none
         case .airportsResponse(.failure(.loadingFailed(_))):
+            state.isLoadingAirports = false
+            state.hasLoadedAirports = false
             state.airports = []
             return .none
         case .swapAirport:

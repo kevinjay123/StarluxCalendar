@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct Item: Equatable, Identifiable {
-    var id: UUID = UUID()
+    var id: String = ""
     var departureDate: String = ""
     var status: String = ""
     var reason: String = ""

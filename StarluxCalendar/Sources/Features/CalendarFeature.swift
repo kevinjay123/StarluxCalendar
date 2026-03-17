@@ -10,6 +10,7 @@ import SwiftUI
 
 @Reducer
 struct CalendarFeature {
+    private static let holidayDateFormatter = DateFormatter.create(with: .yMd)
     
     @ObservableState
     struct State: Equatable {
@@ -80,7 +81,7 @@ struct CalendarFeature {
         case .calendarRequest(let result):
             state.isLoading = true
             
-            let code = result?.meta?.fareProducts.filter({ $0.cabin == state.cabin.rawValue }).first?.fareFamilyCode ?? ""
+            let code = result?.meta?.fareProducts.first(where: { $0.cabin == state.cabin.rawValue })?.fareFamilyCode ?? ""
             let date = state.departureDate
             let fromCity = result == nil ? state.fromCity : state.toCity
             let toCity = result == nil ? state.toCity : state.fromCity
@@ -135,7 +136,8 @@ struct CalendarFeature {
             var holidays: [Int: Holiday?] = [:]
             
             for holiday in result {
-                if let date = Date().dateFrom(holiday.date ?? "", format: .yMd),
+                if let holidayDate = holiday.date,
+                    let date = Self.holidayDateFormatter.date(from: holidayDate),
                     date.year() == departureDate.year(),
                     date.month() == departureDate.month()
                 {
@@ -184,7 +186,7 @@ struct CalendarFeature {
             while count <= maximumDaysInGrid {
                 /// 補足當月第一天以前的空白天數
                 if count <= startingSpaces {
-                    items.append(Item())
+                    items.append(Item(id: "blank-\(count)"))
                 } else {
                     /// 將預設值減第一天以前的空白天數，即為所在日期
                     let calendarDay = count - startingSpaces
@@ -192,7 +194,7 @@ struct CalendarFeature {
                     if calendarDay <= daysInMonth {
                         
                         /// 行事曆預設資料
-                        var item = Item(departureDate: String(calendarDay))
+                        var item = Item(id: "day-\(calendarDay)", departureDate: String(calendarDay))
                         
                         /// 將 API 資料塞進行事曆
                         if let calendar = reportInfos.first {
