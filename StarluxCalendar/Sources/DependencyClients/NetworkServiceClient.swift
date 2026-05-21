@@ -12,7 +12,7 @@ enum NetworkError: Error, Equatable {
     case loadingFailed(String)
 }
 
-protocol NetworkService {
+protocol NetworkService: Sendable {
     func search(departureDate: Date, fromCity: String, toCity: String, cabin: String) async throws -> FlightSearchResult?
     func calendar(departureDate: Date, fromCity: String, toCity: String, cabin: String, goFareFamilyCode: String) async throws -> FlightMonthResult?
     func holiday() async throws -> [Holiday]?
@@ -75,7 +75,7 @@ extension NetworkServiceClient {
 }
 
 private enum NetworkServiceKey: DependencyKey {
-    static var liveValue: any NetworkService = NetworkServiceClient()
+    static let liveValue: any NetworkService = NetworkServiceClient()
 }
 
 extension DependencyValues {

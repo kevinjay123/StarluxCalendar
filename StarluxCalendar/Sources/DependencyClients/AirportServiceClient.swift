@@ -12,7 +12,7 @@ enum AirportError: Error, Equatable {
     case loadingFailed(String)
 }
 
-protocol AirportService {
+protocol AirportService: Sendable {
     func loadAirports() async throws -> [AirportModel]
 }
 
