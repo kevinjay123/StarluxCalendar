@@ -103,8 +103,14 @@ struct HomeFeatureTests {
             )
         }
         
-        await store.send(.yearMonth(.presented(.selectYear(2025))))
-        await store.send(.yearMonth(.presented(.selectMonth(10))))
+        await store.send(.yearMonth(.presented(.selectYear(2025)))) {
+            $0.selectedYear = 2025
+            $0.yearMonthPicker?.year = 2025
+        }
+        await store.send(.yearMonth(.presented(.selectMonth(10)))) {
+            $0.selectedMonth = 10
+            $0.yearMonthPicker?.month = 10
+        }
     }
     
     @Test func showAndSelectedCabin() async throws {
@@ -155,7 +161,9 @@ struct HomeFeatureTests {
             HomeFeature()
         }
         
-        await(store.send(.airportsResponse(.success([]))))
+        await store.send(.airportsResponse(.success([]))) {
+            $0.hasLoadedAirports = true
+        }
     }
 
     @Test func scenePhaseBecomeActive_loadsOnlyOnceAfterSuccess() async throws {
@@ -175,7 +183,7 @@ struct HomeFeatureTests {
         await store.send(.scenePhaseBecomeActive) {
             $0.isLoadingAirports = true
         }
-        await store.receive(.airportsResponse(.success([airport, airport2]))) {
+        await store.receive(\.airportsResponse.success, [airport, airport2]) {
             $0.isLoadingAirports = false
             $0.hasLoadedAirports = true
             $0.airports = [airport, airport2]
@@ -202,7 +210,7 @@ struct HomeFeatureTests {
         await store.send(.scenePhaseBecomeActive) {
             $0.isLoadingAirports = true
         }
-        await store.receive(.airportsResponse(.failure(.loadingFailed("load failed")))) {
+        await store.receive(\.airportsResponse.failure, .loadingFailed("load failed")) {
             $0.isLoadingAirports = false
             $0.hasLoadedAirports = false
             $0.airports = []
@@ -211,7 +219,7 @@ struct HomeFeatureTests {
         await store.send(.scenePhaseBecomeActive) {
             $0.isLoadingAirports = true
         }
-        await store.receive(.airportsResponse(.failure(.loadingFailed("load failed")))) {
+        await store.receive(\.airportsResponse.failure, .loadingFailed("load failed")) {
             $0.isLoadingAirports = false
             $0.hasLoadedAirports = false
             $0.airports = []

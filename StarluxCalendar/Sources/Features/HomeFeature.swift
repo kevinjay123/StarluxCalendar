@@ -136,6 +136,8 @@ struct HomeFeature {
                 do {
                     let airports = try await airportService.loadAirports()
                     await send(.airportsResponse(.success(airports)))
+                } catch let error as AirportError {
+                    await send(.airportsResponse(.failure(error)))
                 } catch {
                     await send(.airportsResponse(.failure(.loadingFailed(error.localizedDescription))))
                 }
